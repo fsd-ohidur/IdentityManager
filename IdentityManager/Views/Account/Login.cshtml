@@ -1,0 +1,81 @@
+﻿@model LoginViewModel
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> _signInManager
+
+@{
+	ViewData["Title"] = "Log in";
+}
+<h1 class="text-info">@ViewData["Title"]</h1>
+<div class="row">
+	<div class="col-md-8">
+		<section>
+			<form asp-controller="Account" asp-action="Login" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" class="form-horizontal" role="form">
+				<h4>Use a local account to log in.</h4>
+				<hr />
+				<div asp-validation-summary="All" class="text-danger"></div>
+				<div class="form-floating mb-2">
+					<input asp-for="Email" class="form-control" placeholder=" " />
+					<label asp-for="Email">Email</label>
+					<span asp-validation-for="Email" class="text-danger"></span>
+				</div>
+				<div class="form-floating mb-2">
+					<input asp-for="Password" class="form-control" placeholder=" " />
+					<label asp-for="Password" class="col-md-2 control-label"></label>
+					<span asp-validation-for="Password" class="text-danger"></span>
+				</div>
+				<div class="form-group mb-2">
+					<div class="col-md-10">
+						<div class="checkbox">
+							<label asp-for="RememberMe">
+								<input asp-for="RememberMe" />
+								@Html.DisplayNameFor(m => m.RememberMe)
+							</label>
+						</div>
+					</div>
+				</div>
+				<div class="form-group mb-2">
+					<div class="col-md-2">
+						<button type="submit" class="w-100 btn btn-lg btn-success">Log in</button>
+					</div>
+				</div>
+				<p>
+					<a asp-action="Register" asp-route-returnurl="@ViewData["ReturnUrl"]">Register as a new user?</a>
+				</p>
+				<p>
+					<a asp-action="ForgotPassword">Forgot your password?</a>
+				</p>
+			</form>
+		</section>
+	</div>
+
+	<div class="col-md-4">
+		@{
+			var schemes = await _signInManager.GetExternalAuthenticationSchemesAsync();
+			var loginProviders = schemes.ToList();
+		}
+		<section>
+			<h4>User another service to log in.</h4>
+			<hr />
+
+			<form asp-controller="Account" asp-action="ExternalLogin" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" role="form">
+			<div>
+				<p>
+						@foreach (var provider in loginProviders)
+						{
+							<button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" 
+								title="Log in using user @provider.Name account"> @provider.Name </button>
+
+
+						}
+					</p>
+			</div>
+			</form>
+		</section>
+	</div>
+</div>
+
+@section Scripts {
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
+}

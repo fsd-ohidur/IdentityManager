@@ -1,0 +1,26 @@
+﻿@{
+	ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+	<h1 class="display-4">Welcome</h1>
+	@if (User.Identity.IsAuthenticated)
+	{
+		var twoFactor = ViewData["TwoFactorEnabled"];
+		if (twoFactor != null && twoFactor.ToString().ToLower() == "true")
+		{
+			<a asp-controller="Account" asp-action="RemoveAuthenticator" class="btn btn-warning">
+				Reset &amp; Remove Two Factor Authentication
+			</a>
+		}
+		else
+		{
+			<a asp-action="EnableAuthenticator" asp-controller="Account">
+				Setup Two Factor Authentication
+			</a>
+		}
+		<br />
+		<br />
+	}
+	<p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
