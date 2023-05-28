@@ -21,6 +21,11 @@ builder.Services.Configure<IdentityOptions>(options =>
 	options.Lockout.MaxFailedAccessAttempts= 2;
 });
 
+builder.Services.ConfigureApplicationCookie(options =>
+{
+	options.AccessDeniedPath = new Microsoft.AspNetCore.Http.PathString("/Account/AccessDenied");
+});
+
 builder.Services.AddTransient<IEmailServiceCustom, EmailServiceCustom>();
 
 

@@ -1,8 +1,17 @@
-﻿ViewBag.Header
-@{
+﻿@{
 	ViewData["Title"] = ViewBag.Header;
 }
-<h1 class="text-danger">@ViewBag.Header</h1>
-<p>
-	@Html.Raw(ViewBag.Message)
-</p
+<div class="row">
+	<div class="col-md-12">
+		<div class="card">
+			<div class="card-header bg-light text-center">
+				<h2 class="display-4 text-danger">@ViewBag.Header</h2>
+			</div>
+			<div class="card-body">
+				<p class="mt-2 mb-2 fs-4">
+					@Html.Raw(ViewBag.Message)
+				</p>
+			</div>
+		</div>
+	</div>
+</div>
