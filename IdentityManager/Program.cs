@@ -11,23 +11,24 @@ var config = builder.Configuration;
 var connectionString = config.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 	options.UseSqlServer(connectionString));
-builder.Services.AddIdentity<IdentityUser, IdentityRole>()
-	.AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
+
+builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
+	.AddRoles<IdentityRole>()
+	.AddEntityFrameworkStores<ApplicationDbContext>();
+//builder.Services.AddIdentity<IdentityUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = false)
+//	.AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
 builder.Services.Configure<IdentityOptions>(options =>
 {
 	options.Password.RequiredLength = 5;
 	options.Password.RequireLowercase = true;
-	options.Lockout.DefaultLockoutTimeSpan= TimeSpan.FromSeconds(30);
-	options.Lockout.MaxFailedAccessAttempts= 2;
+	options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromSeconds(30);
+	options.Lockout.MaxFailedAccessAttempts = 2;
 });
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
 	options.AccessDeniedPath = new Microsoft.AspNetCore.Http.PathString("/Account/AccessDenied");
 });
-
-builder.Services.AddTransient<IEmailServiceCustom, EmailServiceCustom>();
-
 
 builder.Services.AddAuthentication().AddFacebook(options =>
 {
@@ -36,6 +37,7 @@ builder.Services.AddAuthentication().AddFacebook(options =>
 });
 
 builder.Services.AddControllersWithViews();
+builder.Services.AddRazorPages();
 
 var app = builder.Build();
 
@@ -58,5 +60,7 @@ app.UseAuthorization();
 app.MapControllerRoute(
 	name: "default",
 	pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.MapRazorPages();
 
 app.Run();

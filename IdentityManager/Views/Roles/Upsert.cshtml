@@ -1,0 +1,50 @@
+﻿@model Microsoft.AspNetCore.Identity.IdentityRole
+
+@{
+	var title = "Create Role";
+}
+
+<form method="post">
+	@if (Model != null && !string.IsNullOrEmpty(Model.Id))
+	{
+		title = "Edit Role";
+
+		<input asp-for="@Model.Id" hidden>
+	}
+	@{
+		ViewData["Title"] = title;
+	}
+
+	<div class="border p-3 bg-white">
+		<div class="form-group row">
+			<h2 class="text-info pl-3">@title</h2>
+		</div>
+		<div class="row">
+			<div class="col-8">
+				<div class="form-floating mb-2">
+					<input asp-for="Id" class="form-control p-2" readonly placeholder=" " />
+					<label asp-for="Id">Id</label>
+					@*<span asp-validation-for="Id" class="text-danger"></span>*@
+				</div>
+				<div class="form-floating mb-2">
+					<input asp-for="Name" class="form-control" placeholder=" " autocomplete="off" />
+					<label asp-for="Name">Name</label>
+					<span asp-validation-for="Name" class="text-danger"></span>
+				</div>
+				<div class="form-group mb-2">
+					<div class="d-flex mb-2">
+						@if (Model != null && !string.IsNullOrEmpty(Model.Id))
+						{
+							<button type="submit" class="btn btn-lg btn-info">Update</button>
+						}
+						else
+						{
+							<button type="submit" class="btn btn-lg btn-primary">Create</button>
+						}
+						<a asp-action="Index" class="btn btn-lg btn-success ms-1">Back to list</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</form>

@@ -43,20 +43,6 @@ namespace IdentityManager.Controllers
 				await _roleManager.CreateAsync(new IdentityRole("User"));
 			}
 
-			//List<SelectListItem> roleListItems = new List<SelectListItem>()
-			//{
-			//	new SelectListItem
-			//	{
-			//		Value="Admin",
-			//		Text = "Admin"
-			//	},
-			//	new SelectListItem
-			//	{
-			//		Value="User",
-			//		Text = "User"
-			//	}
-			//};
-
 			ViewData["ReturnUrl"] = returnUrl;
 			RegisterViewModel model = new RegisterViewModel()
 			{
