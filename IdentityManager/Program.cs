@@ -1,7 +1,9 @@
+using IdentityManager;
 using IdentityManager.Data;
 using IdentityManager.Service;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,9 +16,12 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
 	.AddRoles<IdentityRole>()
-	.AddEntityFrameworkStores<ApplicationDbContext>();
+	.AddEntityFrameworkStores<ApplicationDbContext>()
+	.AddDefaultUI();
 //builder.Services.AddIdentity<IdentityUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = false)
-//	.AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
+//	.AddEntityFrameworkStores<ApplicationDbContext>()
+//	.AddDefaultTokenProviders()	// No need this when user AddDefaultIdentity
+//	.AddDefaultUI(); //System will get Identity Razor pages as default not account controller
 builder.Services.Configure<IdentityOptions>(options =>
 {
 	options.Password.RequiredLength = 5;
@@ -25,15 +30,36 @@ builder.Services.Configure<IdentityOptions>(options =>
 	options.Lockout.MaxFailedAccessAttempts = 2;
 });
 
-builder.Services.ConfigureApplicationCookie(options =>
-{
-	options.AccessDeniedPath = new Microsoft.AspNetCore.Http.PathString("/Account/AccessDenied");
-});
+//builder.Services.ConfigureApplicationCookie(options =>
+//{
+//	options.AccessDeniedPath = new Microsoft.AspNetCore.Http.PathString("/Account/AccessDenied");
+//});
 
 builder.Services.AddAuthentication().AddFacebook(options =>
 {
 	options.AppId = config.GetValue<string>("ExternalLogin:Facebook:AppId");
 	options.AppSecret = config.GetValue<string>("ExternalLogin:Facebook:SecretKey");
+});
+
+builder.Services.AddAuthorization(opt =>
+{
+	opt.AddPolicy("Admin", pol => pol.RequireRole("Admin"));
+	opt.AddPolicy("UserAndAdmin", pol => pol.RequireRole("Admin").RequireRole("User"));
+	opt.AddPolicy("Admin_CreateAccess", pol => pol.RequireRole("Admin").RequireClaim("create", "True"));
+	opt.AddPolicy("Admin_Create_Edit_DeleteAccess", pol => pol.RequireRole("Admin")
+		.RequireClaim("create", "True")
+		.RequireClaim("edit", "True")
+		.RequireClaim("delete", "True"));
+	opt.AddPolicy("Admin_Create_Edit_DeleteAccess_Or_SuperAdmin",
+		pol => pol.RequireAssertion(
+			context =>
+			(
+				context.User.IsInRole("Admin")
+					&& context.User.HasClaim(c => c.Type == "Create" && c.Value == "True")
+					&& context.User.HasClaim(c => c.Type == "Edit" && c.Value == "True")
+					&& context.User.HasClaim(c => c.Type == "Delete" && c.Value == "True")
+			) || context.User.IsInRole("SuperAdmin")
+		));
 });
 
 builder.Services.AddControllersWithViews();
@@ -64,3 +90,5 @@ app.MapControllerRoute(
 app.MapRazorPages();
 
 app.Run();
+
+

@@ -1,4 +1,5 @@
 ﻿using IdentityManager.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -8,6 +9,7 @@ namespace IdentityManager.Controllers
 {
 	public class RolesController : Controller
 	{
+		// Dependency Injection
 		private readonly ApplicationDbContext _context;
 		private readonly UserManager<IdentityUser> _userManager;
 		private readonly RoleManager<IdentityRole> _roleManager;
@@ -18,12 +20,14 @@ namespace IdentityManager.Controllers
 			_roleManager = roleManager;
 		}
 
+		//List of the roles
 		public async Task<IActionResult> Index()
 		{
 			var roles = await _context.Roles.ToListAsync();
 			return View(roles);
 		}
 
+		//Get - Update & Insert = Upsert
 		[HttpGet]
 		public async Task<IActionResult> Upsert(string id)
 		{
@@ -40,7 +44,9 @@ namespace IdentityManager.Controllers
 			}
 		}
 
+		//Post - Update & Insert = Upsert
 		[HttpPost]
+		[Authorize(Policy = "Admin")]
 		[AutoValidateAntiforgeryToken]
 		public async Task<IActionResult> Upsert(IdentityRole model)
 		{
@@ -77,7 +83,9 @@ namespace IdentityManager.Controllers
 		}
 
 
+		//Delete - Only super admin can delete
 		[HttpPost]
+		[Authorize(Policy = "Admin")]
 		[AutoValidateAntiforgeryToken]
 		public async Task<IActionResult> Delete(string id)
 		{
